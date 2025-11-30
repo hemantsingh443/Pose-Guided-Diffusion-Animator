@@ -20,4 +20,4 @@ python -m src.animation.animate
 ## Results 
 the gif shows the animation of the stick figure, the animation is pretty restricted due to the RL agents current limitations in training 
 
-![posemap_animation](public/posemap_animation.gif)
+<img src="public/posemap_animation.gif" alt="posemap_animation" width="50%">
