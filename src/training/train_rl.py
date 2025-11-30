@@ -12,7 +12,7 @@ def train_rl_sb3():
     model = PPO("MlpPolicy", env, verbose=1, learning_rate=3e-4, n_steps=2048, batch_size=64, n_epochs=10)
     
     print("Training RL Agent (PPO)...")
-    # Train for 5k steps
+    # Train for 10k steps
     model.learn(total_timesteps=10000)
     
     if not os.path.exists("models"):

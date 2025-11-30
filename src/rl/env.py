@@ -39,8 +39,7 @@ class StickFigureEnv(gym.Env):
         keys = ['torso', 'head', 'l_shoulder', 'l_elbow', 'r_shoulder', 'r_elbow', 'l_hip', 'l_knee', 'r_hip', 'r_knee']
         
         # Apply action (scaled)
-        # Action is [-1, 1], we map it to [-5, 5] degrees change
-        scale = 5.0
+        scale = 10.0 # Increased for more motion
         
         for i, k in enumerate(keys):
             change = action[i] * scale
@@ -52,21 +51,14 @@ class StickFigureEnv(gym.Env):
             
         self.steps += 1
         
-        # Reward Function: "Jumping Jack" / "Star Jump"
-        # Goal: Maximize spread of limbs (hands up, feet out) AND vertical hip movement?
-        # Let's try a simple "Jump": Maximize Hip Height (Minimize Hip Y)
+        # Reward: Dynamic Waving (Track a Sine Wave with Left Arm)
+        # Target oscillates between -130 and -50 degrees (Arm waving up and down)
+        target_angle = -90 + np.sin(self.steps * 0.2) * 40
         
-        joints = self.skeleton.forward_kinematics(self.state)
-        hip_y = joints['hip'][1] # 0 is top, 1 is bottom. We want to minimize this.
+        # Normalize error
+        angle_error = abs(self.state['l_shoulder'] - target_angle) / 180.0
         
-        # Base reward: Height
-        # hip_y is usually around 0.5. 
-        # If hip_y < 0.4, good jump.
-        reward = (0.5 - hip_y) * 10.0 
-        
-        # Stability/Symmetry reward (optional)
-        # Keep torso upright
-        reward -= abs(self.state['torso']) * 0.1
+        reward = 1.0 - angle_error
         
         # Smoothness penalty
         reward -= np.sum(np.square(action)) * 0.01
